@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/beautifulentropy/validator/v10"
 	"github.com/go-playground/locales"
 	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
 )
 
 // RegisterDefaultTranslations registers a set of default translations
@@ -987,36 +987,6 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 			override:    false,
 		},
 		{
-			tag:         "hexcolor",
-			translation: "{0} must be a valid HEX color",
-			override:    false,
-		},
-		{
-			tag:         "rgb",
-			translation: "{0} must be a valid RGB color",
-			override:    false,
-		},
-		{
-			tag:         "rgba",
-			translation: "{0} must be a valid RGBA color",
-			override:    false,
-		},
-		{
-			tag:         "hsl",
-			translation: "{0} must be a valid HSL color",
-			override:    false,
-		},
-		{
-			tag:         "hsla",
-			translation: "{0} must be a valid HSLA color",
-			override:    false,
-		},
-		{
-			tag:         "e164",
-			translation: "{0} must be a valid E.164 formatted phone number",
-			override:    false,
-		},
-		{
 			tag:         "email",
 			translation: "{0} must be a valid email address",
 			override:    false,
@@ -1107,21 +1077,6 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 			},
 		},
 		{
-			tag:         "isbn",
-			translation: "{0} must be a valid ISBN number",
-			override:    false,
-		},
-		{
-			tag:         "isbn10",
-			translation: "{0} must be a valid ISBN-10 number",
-			override:    false,
-		},
-		{
-			tag:         "isbn13",
-			translation: "{0} must be a valid ISBN-13 number",
-			override:    false,
-		},
-		{
 			tag:         "uuid",
 			translation: "{0} must be a valid UUID",
 			override:    false,
@@ -1142,11 +1097,6 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 			override:    false,
 		},
 		{
-			tag:         "ulid",
-			translation: "{0} must be a valid ULID",
-			override:    false,
-		},
-		{
 			tag:         "ascii",
 			translation: "{0} must contain only ascii characters",
 			override:    false,
@@ -1159,26 +1109,6 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 		{
 			tag:         "multibyte",
 			translation: "{0} must contain multibyte characters",
-			override:    false,
-		},
-		{
-			tag:         "datauri",
-			translation: "{0} must contain a valid Data URI",
-			override:    false,
-		},
-		{
-			tag:         "latitude",
-			translation: "{0} must contain valid latitude coordinates",
-			override:    false,
-		},
-		{
-			tag:         "longitude",
-			translation: "{0} must contain a valid longitude coordinates",
-			override:    false,
-		},
-		{
-			tag:         "ssn",
-			translation: "{0} must be a valid SSN number",
 			override:    false,
 		},
 		{
@@ -1257,11 +1187,6 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 			override:    false,
 		},
 		{
-			tag:         "unix_addr",
-			translation: "{0} must be a resolvable UNIX address",
-			override:    false,
-		},
-		{
 			tag:         "mac",
 			translation: "{0} must contain a valid MAC address",
 			override:    false,
@@ -1274,11 +1199,6 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 		{
 			tag:         "unique",
 			translation: "{0} must contain unique values",
-			override:    false,
-		},
-		{
-			tag:         "iscolor",
-			translation: "{0} must be a valid color",
 			override:    false,
 		},
 		{
@@ -1300,11 +1220,6 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 			override:    false,
 		},
 		{
-			tag:         "jwt",
-			translation: "{0} must be a valid jwt string",
-			override:    false,
-		},
-		{
 			tag:         "lowercase",
 			translation: "{0} must be a lowercase string",
 			override:    false,
@@ -1317,34 +1232,6 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 		{
 			tag:         "datetime",
 			translation: "{0} does not match the {1} format",
-			override:    false,
-			customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
-				t, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
-				if err != nil {
-					log.Printf("warning: error translating FieldError: %#v", fe)
-					return fe.(error).Error()
-				}
-
-				return t
-			},
-		},
-		{
-			tag:         "postcode_iso3166_alpha2",
-			translation: "{0} does not match postcode format of {1} country",
-			override:    false,
-			customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
-				t, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
-				if err != nil {
-					log.Printf("warning: error translating FieldError: %#v", fe)
-					return fe.(error).Error()
-				}
-
-				return t
-			},
-		},
-		{
-			tag:         "postcode_iso3166_alpha2_field",
-			translation: "{0} does not match postcode format of country in {1} field",
 			override:    false,
 			customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
 				t, err := ut.T(fe.Tag(), fe.Field(), fe.Param())

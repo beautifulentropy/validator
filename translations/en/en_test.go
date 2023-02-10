@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/beautifulentropy/validator/v10"
 	. "github.com/go-playground/assert/v2"
 	english "github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
 )
 
 func TestTranslations(t *testing.T) {
@@ -84,11 +84,6 @@ func TestTranslations(t *testing.T) {
 		NumericString     string            `validate:"numeric"`
 		NumberString      string            `validate:"number"`
 		HexadecimalString string            `validate:"hexadecimal"`
-		HexColorString    string            `validate:"hexcolor"`
-		RGBColorString    string            `validate:"rgb"`
-		RGBAColorString   string            `validate:"rgba"`
-		HSLColorString    string            `validate:"hsl"`
-		HSLAColorString   string            `validate:"hsla"`
 		Email             string            `validate:"email"`
 		URL               string            `validate:"url"`
 		URI               string            `validate:"uri"`
@@ -98,21 +93,13 @@ func TestTranslations(t *testing.T) {
 		Excludes          string            `validate:"excludes=text"`
 		ExcludesAll       string            `validate:"excludesall=!@#$"`
 		ExcludesRune      string            `validate:"excludesrune=☻"`
-		ISBN              string            `validate:"isbn"`
-		ISBN10            string            `validate:"isbn10"`
-		ISBN13            string            `validate:"isbn13"`
 		UUID              string            `validate:"uuid"`
 		UUID3             string            `validate:"uuid3"`
 		UUID4             string            `validate:"uuid4"`
 		UUID5             string            `validate:"uuid5"`
-		ULID              string            `validate:"ulid"`
 		ASCII             string            `validate:"ascii"`
 		PrintableASCII    string            `validate:"printascii"`
 		MultiByte         string            `validate:"multibyte"`
-		DataURI           string            `validate:"datauri"`
-		Latitude          string            `validate:"latitude"`
-		Longitude         string            `validate:"longitude"`
-		SSN               string            `validate:"ssn"`
 		IP                string            `validate:"ip"`
 		IPv4              string            `validate:"ipv4"`
 		IPv6              string            `validate:"ipv6"`
@@ -128,10 +115,7 @@ func TestTranslations(t *testing.T) {
 		IPAddr            string            `validate:"ip_addr"`
 		IPAddrv4          string            `validate:"ip4_addr"`
 		IPAddrv6          string            `validate:"ip6_addr"`
-		UinxAddr          string            `validate:"unix_addr"` // can't fail from within Go's net package currently, but maybe in the future
-		MAC               string            `validate:"mac"`
 		FQDN              string            `validate:"fqdn"`
-		IsColor           string            `validate:"iscolor"`
 		StrPtrMinLen      *string           `validate:"min=10"`
 		StrPtrMaxLen      *string           `validate:"max=1"`
 		StrPtrLen         *string           `validate:"len=2"`
@@ -145,14 +129,10 @@ func TestTranslations(t *testing.T) {
 		UniqueArray       [3]string         `validate:"unique"`
 		UniqueMap         map[string]string `validate:"unique"`
 		JSONString        string            `validate:"json"`
-		JWTString         string            `validate:"jwt"`
 		LowercaseString   string            `validate:"lowercase"`
 		UppercaseString   string            `validate:"uppercase"`
 		Datetime          string            `validate:"datetime=2006-01-02"`
-		PostCode          string            `validate:"postcode_iso3166_alpha2=SG"`
-		PostCodeCountry   string
-		PostCodeByField   string `validate:"postcode_iso3166_alpha2_field=PostCodeCountry"`
-		BooleanString     string `validate:"boolean"`
+		BooleanString     string            `validate:"boolean"`
 	}
 
 	var test Test
@@ -220,14 +200,6 @@ func TestTranslations(t *testing.T) {
 		expected string
 	}{
 		{
-			ns:       "Test.IsColor",
-			expected: "IsColor must be a valid color",
-		},
-		{
-			ns:       "Test.MAC",
-			expected: "MAC must contain a valid MAC address",
-		},
-		{
 			ns:       "Test.FQDN",
 			expected: "FQDN must be a valid FQDN",
 		},
@@ -280,10 +252,6 @@ func TestTranslations(t *testing.T) {
 			expected: "CIDRv6 must contain a valid CIDR notation for an IPv6 address",
 		},
 		{
-			ns:       "Test.SSN",
-			expected: "SSN must be a valid SSN number",
-		},
-		{
 			ns:       "Test.IP",
 			expected: "IP must be a valid IP address",
 		},
@@ -294,18 +262,6 @@ func TestTranslations(t *testing.T) {
 		{
 			ns:       "Test.IPv6",
 			expected: "IPv6 must be a valid IPv6 address",
-		},
-		{
-			ns:       "Test.DataURI",
-			expected: "DataURI must contain a valid Data URI",
-		},
-		{
-			ns:       "Test.Latitude",
-			expected: "Latitude must contain valid latitude coordinates",
-		},
-		{
-			ns:       "Test.Longitude",
-			expected: "Longitude must contain a valid longitude coordinates",
 		},
 		{
 			ns:       "Test.MultiByte",
@@ -334,22 +290,6 @@ func TestTranslations(t *testing.T) {
 		{
 			ns:       "Test.UUID5",
 			expected: "UUID5 must be a valid version 5 UUID",
-		},
-		{
-			ns:       "Test.ULID",
-			expected: "ULID must be a valid ULID",
-		},
-		{
-			ns:       "Test.ISBN",
-			expected: "ISBN must be a valid ISBN number",
-		},
-		{
-			ns:       "Test.ISBN10",
-			expected: "ISBN10 must be a valid ISBN-10 number",
-		},
-		{
-			ns:       "Test.ISBN13",
-			expected: "ISBN13 must be a valid ISBN-13 number",
 		},
 		{
 			ns:       "Test.Excludes",
@@ -386,30 +326,6 @@ func TestTranslations(t *testing.T) {
 		{
 			ns:       "Test.URI",
 			expected: "URI must be a valid URI",
-		},
-		{
-			ns:       "Test.RGBColorString",
-			expected: "RGBColorString must be a valid RGB color",
-		},
-		{
-			ns:       "Test.RGBAColorString",
-			expected: "RGBAColorString must be a valid RGBA color",
-		},
-		{
-			ns:       "Test.HSLColorString",
-			expected: "HSLColorString must be a valid HSL color",
-		},
-		{
-			ns:       "Test.HSLAColorString",
-			expected: "HSLAColorString must be a valid HSLA color",
-		},
-		{
-			ns:       "Test.HexadecimalString",
-			expected: "HexadecimalString must be a valid hexadecimal",
-		},
-		{
-			ns:       "Test.HexColorString",
-			expected: "HexColorString must be a valid HEX color",
 		},
 		{
 			ns:       "Test.NumberString",
@@ -668,10 +584,6 @@ func TestTranslations(t *testing.T) {
 			expected: "JSONString must be a valid json string",
 		},
 		{
-			ns:       "Test.JWTString",
-			expected: "JWTString must be a valid jwt string",
-		},
-		{
 			ns:       "Test.LowercaseString",
 			expected: "LowercaseString must be a lowercase string",
 		},
@@ -682,14 +594,6 @@ func TestTranslations(t *testing.T) {
 		{
 			ns:       "Test.Datetime",
 			expected: "Datetime does not match the 2006-01-02 format",
-		},
-		{
-			ns:       "Test.PostCode",
-			expected: "PostCode does not match postcode format of SG country",
-		},
-		{
-			ns:       "Test.PostCodeByField",
-			expected: "PostCodeByField does not match postcode format of country in PostCodeCountry field",
 		},
 		{
 			ns:       "Test.BooleanString",

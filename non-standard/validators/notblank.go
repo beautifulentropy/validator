@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/go-playground/validator/v10"
+	"github.com/beautifulentropy/validator/v10"
 )
 
 // NotBlank is the validation function for validating if the current field
