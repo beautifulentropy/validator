@@ -31,7 +31,7 @@ Use go get.
 
 Then import the validator package into your own code.
 
-	import "github.com/beautifulentropy/validator/v10"
+	import "github.com/letsencrypt/validator/v10"
 
 Error Return Value
 -------

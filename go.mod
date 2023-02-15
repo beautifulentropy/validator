@@ -1,4 +1,4 @@
-module github.com/beautifulentropy/validator/v10
+module github.com/letsencrypt/validator/v10
 
 go 1.18
 

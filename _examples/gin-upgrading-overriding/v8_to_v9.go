@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/beautifulentropy/validator/v10"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/letsencrypt/validator/v10"
 )
 
 type defaultValidator struct {

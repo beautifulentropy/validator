@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/beautifulentropy/validator/v10"
+	"github.com/letsencrypt/validator/v10"
 )
 
 var validate *validator.Validate

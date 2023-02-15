@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/beautifulentropy/validator/v10"
 	"github.com/go-playground/locales"
 	ut "github.com/go-playground/universal-translator"
+	"github.com/letsencrypt/validator/v10"
 )
 
 // RegisterDefaultTranslations registers a set of default translations

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/beautifulentropy/validator/v10"
+	"github.com/letsencrypt/validator/v10"
 )
 
 // User contains user information

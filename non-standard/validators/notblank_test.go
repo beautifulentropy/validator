@@ -3,8 +3,8 @@ package validators
 import (
 	"testing"
 
-	"github.com/beautifulentropy/validator/v10"
 	"github.com/go-playground/assert/v2"
+	"github.com/letsencrypt/validator/v10"
 )
 
 type test struct {
