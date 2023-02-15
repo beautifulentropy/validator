@@ -106,10 +106,15 @@ func New() *Validate {
 
 	v := &Validate{
 		tagName:     defaultTagName,
-		aliases:     make(map[string]string),
+		aliases:     make(map[string]string, len(bakedInAliases)),
 		validations: make(map[string]internalValidationFuncWrapper, len(bakedInValidators)),
 		tagCache:    tc,
 		structCache: sc,
+	}
+
+	// must copy alias validators for separate validations to be used in each validator instance
+	for k, val := range bakedInAliases {
+		v.RegisterAlias(k, val)
 	}
 
 	// must copy validators for separate validations to be used in each instance
@@ -185,14 +190,14 @@ func (v *Validate) ValidateMap(data map[string]interface{}, rules map[string]int
 //
 // eg. to use the names which have been specified for JSON representations of structs, rather than normal Go field names:
 //
-//	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-//	    name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
-//	    // skip if tag key says it should be ignored
-//	    if name == "-" {
-//	        return ""
-//	    }
-//	    return name
-//	})
+//    validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+//        name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+//        // skip if tag key says it should be ignored
+//        if name == "-" {
+//            return ""
+//        }
+//        return name
+//    })
 func (v *Validate) RegisterTagNameFunc(fn TagNameFunc) {
 	v.tagNameFunc = fn
 	v.hasTagNameFunc = true

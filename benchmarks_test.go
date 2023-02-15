@@ -238,6 +238,50 @@ func BenchmarkFieldCustomTypeFailureParallel(b *testing.B) {
 	})
 }
 
+func BenchmarkFieldOrTagSuccess(b *testing.B) {
+	validate := New()
+	s := "rgba(0,0,0,1)"
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		_ = validate.Var(s, "rgb|rgba")
+	}
+}
+
+func BenchmarkFieldOrTagSuccessParallel(b *testing.B) {
+	validate := New()
+	s := "rgba(0,0,0,1)"
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_ = validate.Var(s, "rgb|rgba")
+		}
+	})
+}
+
+func BenchmarkFieldOrTagFailure(b *testing.B) {
+	validate := New()
+	s := "#000"
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		_ = validate.Var(s, "rgb|rgba")
+	}
+}
+
+func BenchmarkFieldOrTagFailureParallel(b *testing.B) {
+	validate := New()
+	s := "#000"
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_ = validate.Var(s, "rgb|rgba")
+		}
+	})
+}
+
 func BenchmarkStructLevelValidationSuccess(b *testing.B) {
 	validate := New()
 	validate.RegisterStructValidation(StructValidationTestStructSuccess, TestStruct{})
