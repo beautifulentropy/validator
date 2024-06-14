@@ -230,7 +230,7 @@ func (v *Validate) RegisterValidationCtx(tag string, fn FuncCtx, callValidationE
 //
 // Example: type MyDuration time.Duration
 func (v *Validate) RegisterDurationType(t any) {
-	GlobalTimeDurationTypes = append(GlobalTimeDurationTypes, reflect.TypeOf(t))
+	customTimeDurationTypes = append(customTimeDurationTypes, reflect.TypeOf(t))
 }
 
 func (v *Validate) registerValidation(tag string, fn FuncCtx, bakedIn bool, nilCheckable bool) error {
