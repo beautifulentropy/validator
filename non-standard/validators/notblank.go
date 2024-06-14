@@ -9,7 +9,7 @@ import (
 
 // NotBlank is the validation function for validating if the current field
 // has a value or length greater than zero, or is not a space only string.
-func NotBlank(fl validator.FieldLevel) bool {
+func NotBlank(v *validator.Validate, fl validator.FieldLevel) bool {
 	field := fl.Field()
 
 	switch field.Kind() {

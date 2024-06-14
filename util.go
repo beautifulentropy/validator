@@ -242,20 +242,22 @@ func asIntFromTimeDuration(param string) int64 {
 	return int64(d)
 }
 
-// customTimeDurationTypes holds specific application registered custom
-// time.Duration types so their values can be properly parsed as time.Duration.
-var customTimeDurationTypes = []reflect.Type{timeDurationType}
-
-// asIntFromType calls the proper function to parse param as int64,
-// given a field's Type t.
-func asIntFromType(t reflect.Type, param string) int64 {
-	for _, ctdt := range customTimeDurationTypes {
-		if t == ctdt {
+// asIntFromType calls the proper function to parse the param as an int64, given
+// a field's Type t.
+func asIntFromType(v *Validate, t reflect.Type, param string) int64 {
+	// First check if there are any custom types.
+	for _, ct := range v.customTypes {
+		if t == ct {
 			return asIntFromTimeDuration(param)
 		}
 	}
 
-	return asInt(param)
+	switch t {
+	case timeDurationType:
+		return asIntFromTimeDuration(param)
+	default:
+		return asInt(param)
+	}
 }
 
 // asUint returns the parameter as a uint64

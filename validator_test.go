@@ -702,7 +702,7 @@ func TestNilValidator(t *testing.T) {
 
 	var val *Validate
 
-	fn := func(fl FieldLevel) bool {
+	fn := func(v *Validate, fl FieldLevel) bool {
 		return fl.Parent().String() == fl.Field().String()
 	}
 
@@ -6905,7 +6905,7 @@ func TestValidateByTagAndValue(t *testing.T) {
 	errs := validate.VarWithValue(val, field, "required")
 	Equal(t, errs, nil)
 
-	fn := func(fl FieldLevel) bool {
+	fn := func(v *Validate, fl FieldLevel) bool {
 		return fl.Parent().String() == fl.Field().String()
 	}
 
@@ -6923,15 +6923,15 @@ func TestValidateByTagAndValue(t *testing.T) {
 }
 
 func TestAddFunctions(t *testing.T) {
-	fn := func(fl FieldLevel) bool {
-		return true
-	}
-
-	fnCtx := func(ctx context.Context, fl FieldLevel) bool {
-		return true
-	}
-
 	validate := New()
+
+	fn := func(v *Validate, fl FieldLevel) bool {
+		return true
+	}
+
+	fnCtx := func(ctx context.Context, v *Validate, fl FieldLevel) bool {
+		return true
+	}
 
 	errs := validate.RegisterValidation("new", fn)
 	Equal(t, errs, nil)
@@ -9280,35 +9280,35 @@ func TestFieldLevelName(t *testing.T) {
 
 		return name
 	})
-	err := validate.RegisterValidation("custom1", func(fl FieldLevel) bool {
+	err := validate.RegisterValidation("custom1", func(v *Validate, fl FieldLevel) bool {
 		res1 = fl.FieldName()
 		alt1 = fl.StructFieldName()
 		return true
 	})
 	Equal(t, err, nil)
 
-	err = validate.RegisterValidation("custom2", func(fl FieldLevel) bool {
+	err = validate.RegisterValidation("custom2", func(v *Validate, fl FieldLevel) bool {
 		res2 = fl.FieldName()
 		alt2 = fl.StructFieldName()
 		return true
 	})
 	Equal(t, err, nil)
 
-	err = validate.RegisterValidation("custom3", func(fl FieldLevel) bool {
+	err = validate.RegisterValidation("custom3", func(v *Validate, fl FieldLevel) bool {
 		res3 = fl.FieldName()
 		alt3 = fl.StructFieldName()
 		return true
 	})
 	Equal(t, err, nil)
 
-	err = validate.RegisterValidation("custom4", func(fl FieldLevel) bool {
+	err = validate.RegisterValidation("custom4", func(v *Validate, fl FieldLevel) bool {
 		res4 = fl.FieldName()
 		alt4 = fl.StructFieldName()
 		return true
 	})
 	Equal(t, err, nil)
 
-	err = validate.RegisterValidation("custom5", func(fl FieldLevel) bool {
+	err = validate.RegisterValidation("custom5", func(v *Validate, fl FieldLevel) bool {
 		res5 = fl.FieldName()
 		alt5 = fl.StructFieldName()
 		return true
@@ -9338,7 +9338,7 @@ func TestFieldLevelName(t *testing.T) {
 func TestValidateStructRegisterCtx(t *testing.T) {
 	var ctxVal string
 
-	fnCtx := func(ctx context.Context, fl FieldLevel) bool {
+	fnCtx := func(ctx context.Context, v *Validate, fl FieldLevel) bool {
 		ctxVal = ctx.Value(&ctxVal).(string)
 		return true
 	}
@@ -10029,7 +10029,7 @@ func TestKeysCustomValidation(t *testing.T) {
 	}
 
 	validate := New()
-	err := validate.RegisterValidation("lang_code", func(fl FieldLevel) bool {
+	err := validate.RegisterValidation("lang_code", func(v *Validate, fl FieldLevel) bool {
 		validLangCodes := map[LangCode]struct{}{
 			"en": {},
 			"es": {},
@@ -11126,7 +11126,7 @@ func TestAbilityToValidateNils(t *testing.T) {
 
 	ts := TestStruct{}
 	val := New()
-	fn := func(fl FieldLevel) bool {
+	fn := func(v *Validate, fl FieldLevel) bool {
 		return fl.Field().Kind() == reflect.Ptr && fl.Field().IsNil()
 	}
 
@@ -11201,7 +11201,7 @@ func TestGetTag(t *testing.T) {
 	}
 
 	val := New()
-	_ = val.RegisterValidation("mytag", func(fl FieldLevel) bool {
+	_ = val.RegisterValidation("mytag", func(v *Validate, fl FieldLevel) bool {
 		tag = fl.GetTag()
 		return true
 	})
@@ -11687,10 +11687,14 @@ func TestTimeZoneValidation(t *testing.T) {
 }
 
 func TestDurationType(t *testing.T) {
+	type newDurationType time.Duration
+
 	tests := []struct {
-		name    string
-		s       interface{} // struct
-		success bool
+		name        string
+		s           interface{} // struct
+		success     bool
+		customType  bool
+		expectPanic bool
 	}{
 		{
 			name: "valid duration string pass",
@@ -11710,21 +11714,46 @@ func TestDurationType(t *testing.T) {
 			},
 			success: true,
 		},
+		{
+			name: "custom duration type validates successfully when registered",
+			s: struct {
+				Value newDurationType `validate:"eq=3s"`
+			}{
+				Value: newDurationType(3 * time.Second),
+			},
+			success:    true,
+			customType: true,
+		},
+		{
+			name: "custom duration type is undetected and panics when not registered",
+			s: struct {
+				Value newDurationType `validate:"eq=3s"`
+			}{
+				Value: newDurationType(3 * time.Second),
+			},
+			expectPanic: true,
+		},
 	}
-
-	validate := New()
 
 	for _, tc := range tests {
 		tc := tc
+		validate := New()
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			errs := validate.Struct(tc.s)
-			if tc.success {
-				Equal(t, errs, nil)
-				return
+			if tc.customType {
+				validate.RegisterCustomType(time.Duration(0), newDurationType(0))
 			}
-			NotEqual(t, errs, nil)
+
+			if tc.expectPanic {
+				PanicMatches(t, func() { _ = validate.Struct(tc.s) }, "strconv.ParseInt: parsing \"3s\": invalid syntax")
+			} else {
+				errs := validate.Struct(tc.s)
+
+				if tc.success {
+					Equal(t, errs, nil)
+					return
+				}
+				NotEqual(t, errs, nil)
+			}
 		})
 	}
 }

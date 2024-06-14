@@ -177,7 +177,7 @@ func (v *validate) traverseField(ctx context.Context, parent reflect.Value, curr
 					v.cf = cf
 					v.ct = ct
 
-					if !ct.fn(ctx, v) {
+					if !ct.fn(ctx, v.Validator(), v) {
 						v.str1 = string(append(ns, cf.altName...))
 
 						if v.v.hasTagNameFunc {
@@ -249,7 +249,7 @@ OUTER:
 			v.cf = cf
 			v.ct = ct
 
-			if !hasValue(v) {
+			if !hasValue(v.Validator(), v) {
 				return
 			}
 
@@ -354,7 +354,7 @@ OUTER:
 				v.cf = cf
 				v.ct = ct
 
-				if ct.fn(ctx, v) {
+				if ct.fn(ctx, v.Validator(), v) {
 					if ct.isBlockEnd {
 						ct = ct.next
 						continue OUTER
@@ -451,7 +451,7 @@ OUTER:
 			v.cf = cf
 			v.ct = ct
 
-			if !ct.fn(ctx, v) {
+			if !ct.fn(ctx, v.Validator(), v) {
 
 				v.str1 = string(append(ns, cf.altName...))
 

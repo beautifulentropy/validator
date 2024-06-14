@@ -89,6 +89,8 @@ type Validate struct {
 	rules            map[reflect.Type]map[string]string
 	tagCache         *tagCache
 	structCache      *structCache
+	hasCustomTypes   bool
+	customTypes      map[reflect.Type]reflect.Type
 }
 
 // New returns a new instance of 'validate' with sane defaults.
@@ -222,17 +224,6 @@ func (v *Validate) RegisterValidationCtx(tag string, fn FuncCtx, callValidationE
 	return v.registerValidation(tag, fn, false, nilCheckable)
 }
 
-// RegisterDurationType is used to register a custom time.Duration type in your
-// application such as the following example. Reasons for implementing a custom
-// time.Duration would be for application specific methods. Note that the
-// validator will handle an aliased time.Duration without the use of this
-// method.
-//
-// Example: type MyDuration time.Duration
-func (v *Validate) RegisterDurationType(t any) {
-	customTimeDurationTypes = append(customTimeDurationTypes, reflect.TypeOf(t))
-}
-
 func (v *Validate) registerValidation(tag string, fn FuncCtx, bakedIn bool, nilCheckable bool) error {
 	if len(tag) == 0 {
 		return errors.New("function Key cannot be empty")
@@ -248,6 +239,23 @@ func (v *Validate) registerValidation(tag string, fn FuncCtx, bakedIn bool, nilC
 	}
 	v.validations[tag] = internalValidationFuncWrapper{fn: fn, runValidatinOnNil: nilCheckable}
 	return nil
+}
+
+// RegisterCustomType is used to map a concrete type to a custom type in your
+// application and gain the ability to use existing validation tags on that
+// custom type just like the concrete type.
+//
+// Example:
+//
+//	type MyDuration time.Duration
+//	validator.New()
+//	validator.RegisterCustomType(time.Duration, MyDuration(0))
+func (v *Validate) RegisterCustomType(originalType any, mappedType any) {
+	if v.customTypes == nil {
+		v.customTypes = make(map[reflect.Type]reflect.Type)
+	}
+	v.customTypes[reflect.TypeOf(originalType)] = reflect.TypeOf(mappedType)
+	v.hasCustomTypes = true
 }
 
 // RegisterAlias registers a mapping of a single validation tag that
